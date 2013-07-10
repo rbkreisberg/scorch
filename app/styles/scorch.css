@@ -1,0 +1,18 @@
+body {
+	font-size: 14px;
+}
+
+#main_container { 
+  margin-top: 60px;
+}
+
+.heatmap_controls {
+  margin-top: 20px;
+}
+
+.main_heatmap {
+	margin: auto;
+	height: 450px;
+	width: 600px;
+	border: solid 1px black;
+}
