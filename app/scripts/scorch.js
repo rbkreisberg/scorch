@@ -1,3 +1,6 @@
+define([
+], function(){
+
 d3.scorch = function(config) {
   var __ = {
     data: [],
@@ -10,7 +13,7 @@ d3.scorch = function(config) {
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
-    color: "#069",
+    color: d3.scale.linear().domain([0,1]).range(['lightyellow','lightblue']),
     composite: "source-over",
     alpha: 0.7
   };
@@ -18,6 +21,7 @@ d3.scorch = function(config) {
   extend(__, config);
 var sc = function(selection) {
   selection = sc.selection = d3.select(selection);
+  selection.classed('scorch', true)
 
   __.width = selection[0][0].clientWidth;
   __.height = selection[0][0].clientHeight;
@@ -59,6 +63,9 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].c
     g, // groups for axes, brushes
     ctx = {},
     canvas = {};
+
+var rectWidth = w() / __.cols.length,
+  rectHeight = h() / __.data.length;
 
 // side effects for setters
 var side_effects = d3.dispatch.apply(this,d3.keys(__))
@@ -115,24 +122,20 @@ sc.autoscale = function() {
   var defaultScales = {
     "number": function(k) {
       return d3.scale.linear()
-        .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+        .domain(d3.extent(__.data, function(d) { return +d[k]; }));
     },
     "string": function(k) {
       return d3.scale.ordinal()
         .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1])
     }
   };
 
-  
-    colorScale = defaultScales[__.types[k]](k);
-  
+  //colorScale = defaultScales[__.types[k]](k).range(__.color.range());
 
   // xscale
-  xscale.rangePoints([0, w()], 1);
-
-  yscale.rangePoints([h(), 0], 1);
+  xscale.domain(__.cols).rangePoints([0, w()], 1);
+  // yscale
+  yscale.domain(_.pluck(__.data,'id')).rangePoints([h(), 0], 1);
 
   // canvas sizes
   sc.selection.selectAll("canvas")
@@ -191,13 +194,13 @@ sc.render = function() {
 sc.render.default = function() {
   sc.clear('foreground');
   if (__.brushed) {
-    __.brushed.forEach(path_foreground);
+    __.brushed.forEach(rect_foreground);
   } else {
-    __.data.forEach(path_foreground);
+    __.data.forEach(row_foreground);
   }
 };
 
-var rqueue = d3.renderQueue(path_foreground)
+var rqueue = d3.renderQueue(row_foreground)
   .rate(50)
   .clear(function() { sc.clear('foreground'); });
 
@@ -215,20 +218,30 @@ sc.shadows = function() {
 };
 
 // draw single rect
-function color_rect(d, ctx) {
-  ctx.fillStyle = d3.functor(__.color)(d);
-  ctx.fillRect(position(d[__.col]),yscale(d[__.row]),__.rectWidth, __.rectHeight);
-  
-  ctx.stroke();
+function color_rect(d, col, ctx) {
+  ctx.fillStyle = d3.functor(__.color)(d[col]).toString();
+  ctx.rect(position(col),yscale(d['id']),rectWidth, rectHeight);
+  ctx.fill();
 };
 
-function rect_foreground(d) {
-  return color_rect(d, ctx.foreground);
+function rect_foreground(d, col) {
+  return color_rect(d, col, ctx.foreground);
 };
 
-function rect_highlight(d) {
-  return color_rect(d, ctx.highlight);
+function rect_highlight(d, col) {
+  return color_rect(d, col, ctx.highlight);
 };
+
+function row_foreground(d) {
+  var r = function(c) { rect_foreground(d,c); };
+  __.cols.forEach(r);
+}
+
+function row_highlight(d) {
+  var r = function(c) { rect_highlight(d,c); };
+  __.cols.forEach(r);
+}
+
 sc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
   return this;
@@ -238,7 +251,7 @@ sc.createAxes = function() {
 
   // Add a group element for each dimension.
   g = sc.svg.append("svg:g")
-      .attr("class", "y-axis");
+      .attr("class", "y-axis")
       .attr("transform", "translate(0,0)")
       .call(axis.scale(yscale));
 
@@ -388,7 +401,7 @@ sc.resize = function() {
 sc.highlight = function(data) {
   sc.clear("highlight");
   d3.select(canvas.foreground).classed("faded", true);
-  data.forEach(path_highlight);
+  data.forEach(rect_highlight);
   events.highlight.call(this,data);
   return this;
 };
@@ -440,9 +453,9 @@ function position(d) {
   var v = dragging[d];
   return v == null ? xscale(d) : v;
 }
-  sc.toString = function() { return "Parallel Coordinates: " + __.cols.length + " cols (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
+  sc.toString = function() { return "Matrix size: " + __.data.length + " rows, " + __.cols.length + " columns)"};
   
-  sc.version = "0.1.7";
+  sc.version = "0.0.1";
 
   return sc;
 };
@@ -506,4 +519,6 @@ d3.renderQueue = (function(func) {
   rq.invalidate = function() {};
 
   return rq;
+});
+
 });
