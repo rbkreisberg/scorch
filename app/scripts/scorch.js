@@ -12,8 +12,8 @@ d3.scorch = function(config) {
     rate: 20,
     width: 600,
     height: 300,
-    margin: { top: 24, right: 0, bottom: 12, left: 0 },
-    color: d3.scale.linear().domain([0,1]).range(['lightyellow','lightblue']),
+    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    color: d3.scale.linear().domain([0,1]).range(['lightyellow','darkblue']),
     composite: "source-over",
     alpha: 0.7
   };
@@ -80,10 +80,12 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   })
   .on("rows", function(d) {
     yscale.domain(__.rows);
+    sc.render();
     if (flags.interactive) sc.render.updateAxes();
   })
   .on("cols", function(d) {
     xscale.domain(__.cols);
+    sc.render();
     if (flags.interactive) sc.render().updateAxes();
   });
 
@@ -130,12 +132,22 @@ sc.autoscale = function() {
     }
   };
 
-  //colorScale = defaultScales[__.types[k]](k).range(__.color.range());
+   // xscale
+  xscale.domain(__.cols).rangeBands([0, w()], 0, 0);
 
-  // xscale
-  xscale.domain(__.cols).rangePoints([0, w()], 1);
+  var yscaleDomain = [];
+  if (__.rows.length > 1) {
+    yscaleDomain = __.rows;
+  }
+  else {
+    yscaleDomain = _.pluck(__.data,'id')
+  }
+
   // yscale
-  yscale.domain(_.pluck(__.data,'id')).rangePoints([h(), 0], 1);
+  yscale.domain(yscaleDomain).rangeBands([h(), 0], 0, 0);
+
+  rectWidth = xscale.rangeBand();
+  rectHeight = yscale.rangeBand();
 
   // canvas sizes
   sc.selection.selectAll("canvas")
@@ -220,8 +232,7 @@ sc.shadows = function() {
 // draw single rect
 function color_rect(d, col, ctx) {
   ctx.fillStyle = d3.functor(__.color)(d[col]).toString();
-  ctx.rect(position(col),yscale(d['id']),rectWidth, rectHeight);
-  ctx.fill();
+  ctx.fillRect(position(col),yscale(d['id']),rectWidth, rectHeight);
 };
 
 function rect_foreground(d, col) {
@@ -233,8 +244,10 @@ function rect_highlight(d, col) {
 };
 
 function row_foreground(d) {
-  var r = function(c) { rect_foreground(d,c); };
-  __.cols.forEach(r);
+  __.cols.forEach(function(c) {
+    ctx.foreground.fillStyle = d3.functor(__.color)(d[c]).toString();
+    ctx.foreground.fillRect(position(c),yscale(d['id']),rectWidth, rectHeight);
+  });
 }
 
 function row_highlight(d) {
@@ -464,36 +477,35 @@ d3.renderQueue = (function(func) {
   var _queue = [],                  // data to be rendered
       _rate = 10,                   // number of calls per frame
       _clear = function() {},       // clearing function
-      _i = 0;                       // current iteration
+      _invalidate = function() {} // invalidate last render queue
 
   var rq = function(data) {
     if (data) rq.data(data);
-    rq.invalidate();
+    _invalidate();
     _clear();
     rq.render();
   };
 
   rq.render = function() {
-    _i = 0;
     var valid = true;
-    rq.invalidate = function() { valid = false; };
+    _invalidate = rq.invalidate = function() { valid = false; };
 
     function doFrame() {
-      if (!valid) return false;
-      if (_i > _queue.length) return false;
-      var chunk = _queue.slice(_i,_i+_rate);
-      _i += _rate;
+      if (!valid) return true;
+      var chunk = _queue.splice(0, _rate);
       chunk.map(func);
-      d3.timer(doFrame);
     }
-
-    doFrame();
+      d3.timer(doFrame);
   };
 
   rq.data = function(data) {
-    rq.invalidate();
+    _invalidate();
     _queue = data.slice(0);
     return rq;
+  };
+
+  rq.add = function(data) {
+    _queue = _queue.concat(data);
   };
 
   rq.rate = function(value) {
@@ -503,7 +515,7 @@ d3.renderQueue = (function(func) {
   };
 
   rq.remaining = function() {
-    return _queue.length - _i;
+    return _queue.length;
   };
 
   // clear the canvas
@@ -516,7 +528,7 @@ d3.renderQueue = (function(func) {
     return rq;
   };
 
-  rq.invalidate = function() {};
+  rq.invalidate = _invalidate;
 
   return rq;
 });
