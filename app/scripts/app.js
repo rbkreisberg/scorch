@@ -1,37 +1,47 @@
 /*global define */
 define([
 	'jquery',
+	'underscore',
 	'scorch',
-	'data_generate'
-], function ($, sc, f) {
+	'data_generate',
+	'binary/heatmap'
+], function ($, _, sc, f, binary) {
 	'use strict';
 
-	var fg = f();
 	var heatmap;
 
-	var dim = 1000,
-	obj;
+	var demoDim = 50,	
+		obj, 
+		data;
 
-	var genomicFeatures =  _.map(_.range(0,dim), fg.generateFeature, fg),
-	    clinicalFeatures =  _.map(_.range(0,dim), fg.generateClinicalNode, fg);
+	function generateData(dim) {
+		if (arguments.length < 1) dim = demoDim;
 
-	var struct = {
-		cols :  _.pluck(clinicalFeatures,'label'),
-		rows : _.pluck(genomicFeatures,'label')
-	};
+		var fg = f();
+		var genomicFeatures =  _.map(_.range(0,dim), fg.generateFeature, fg),
+		    clinicalFeatures =  _.map(_.range(0,dim), fg.generateClinicalNode, fg);
 
-	struct.data = _.map(genomicFeatures, function(r) { 
-			 obj = _.object(this.cols,_.map(_.range(0,dim),Math.random));
-			 obj['id'] = r.label;
-			 return obj;
-			}, struct);
+		var struct = {
+			cols :  _.pluck(clinicalFeatures,'label'),
+			rows : _.pluck(genomicFeatures,'label'),
+			dim : dim
+		};
+
+		struct.data = _.map(genomicFeatures, function(r) { 
+				 obj = _.object(this.cols,_.map(_.range(0,dim),Math.random));
+				 obj['id'] = r.label;
+				 return obj;
+				}, struct);
+
+		return struct;
+	}
 
 	var colorScale = d3.scale.linear().domain([0,1]).range(['lightyellow','lightblue']);
 
 	var reorder = {
 
 		shift : function( label, M ) {
-		var theArray=struct[label];
+		var theArray=data[label];
 	    var size = theArray.length;
 	    theArray.reverse();
 	    Array.prototype.splice.apply(theArray, [0, M - 1].concat(theArray.slice(0, M-1).reverse()));
@@ -40,7 +50,7 @@ define([
 		},
 
 		shuffle : function(label) {
-		return d3.shuffle(struct[label]);
+		return d3.shuffle(data[label]);
 		}
 	};
 
@@ -57,19 +67,38 @@ define([
 				});
 			});
 		});
+		
+		$('#dim_size').keypress(function(event) {
+                if (event.keyCode == $.ui.keyCode.ENTER) {
+                    var val = $(this).val();
+                    data= generateData(parseInt(val) || demoDim);
+                    Application.renderHeatmap();
+                    return false;
+                }
+        });
+
+		$('#load_binary').on('click', function() {
+			binary.loadData('data/heatmap.bin',function(error, data) {console.log(data.FeatureData);});
+			
+		});
+
+		$('form').on('submit', function(evt, ui) {
+			return false;
+		});
 	}
 
 	var Application = {
 		initialize : function() {
 			setElementHooks();
+			data = generateData();
 			return null;
 		},
 		renderHeatmap : function() {
 			var map = d3.scorch({
-				data: struct.data,
-				cols : struct.cols,
-				rows : struct.rows,
-				types : _.object(struct.cols, _.times(dim,function(n) { return 'number'; })),
+				data: data.data,
+				cols : data.cols,
+				rows : data.rows,
+				types : _.object(data.cols, _.times(data.dim,function(n) { return 'number'; })),
 				width: 600,
 				height: 450,
 				mode : 'queue',

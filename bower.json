@@ -9,7 +9,9 @@
     "d3": "~3.2.4",
     "jquery-ui": "~1.10.3",
     "jquery-ui-bootstrap": "~0.2.5",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.1",
+    "jBinary": "git://github.com/jDataView/jBinary.git",
+    "jDataView": "git://github.com/jDataView/jDataView.git"
   },
   "devDependencies": {}
 }

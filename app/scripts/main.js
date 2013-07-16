@@ -8,11 +8,13 @@ require.config({
         bootstrap: 'vendor/bootstrap',
         modernizr: '../bower_components/modernizr',
         queue: '../bower_components/queue-async/queue',
-        underscore: '../bower_components/underscore/underscore'
+        underscore: '../bower_components/underscore/underscore',
+        jDataView: '../bower_components/jDataView/src/jDataView',
+        jBinary : '../bower_components/jBinary/src/jBinary'
     },
     shim: {
-        'underscore': {
-            'exports': '_'
+        underscore: {
+            'exports' : '_'
         },
         "jQuery-ui": {
             "deps": ["jquery"],
@@ -28,7 +30,7 @@ require.config({
     }
 });
 
-require(['app', 'jquery', 'jQuery-ui', 'bootstrap'], function(app, $) {
+require(['app', 'underscore', 'jquery', 'jQuery-ui', 'bootstrap'], function(app, _, $) {
     'use strict';
     app.initialize();
     app.renderHeatmap();
