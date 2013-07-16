@@ -78,7 +78,14 @@ define([
         });
 
 		$('#load_binary').on('click', function() {
-			binary.loadData('data/heatmap.bin',function(error, data) {console.log(data.FeatureData);});
+			binary.loadData('data/heatmap.bin',function(error, matrix) {
+				data.data =  _.map(data.rows, function(r, i) { 
+				 obj = _.object(data.cols, matrix.FeatureData[i]);
+				 obj['id'] = r;
+				 return obj;
+				}, data);
+				Application.renderHeatmap();
+			});
 			
 		});
 
