@@ -6,9 +6,18 @@ Heatmap = {
 	'jBinary.littleEndian': true,
 	'jBinary.mimeType': 'application/octet-stream',
 
+	MatrixDimension: jBinary.Template({
+		baseType: 'uint16',
+		'jBinary.littleEndian' : true,
+	}),
+
 	Dimensions: {
-		cols: 'uint32',
-		rows: 'uint32'
+		cols: 'MatrixDimension',
+		rows: 'MatrixDimension'
+	},
+
+	LabelArray: {
+
 	},
 
 	FeatureRow: jBinary.Template({
@@ -32,7 +41,6 @@ Heatmap = {
 			}
 
 			this.baseType = ['array', itemType, header.size.cols];
-			this.dataOffset = header.dataOffset;
 		},
 
 		read: function () {
@@ -48,33 +56,24 @@ Heatmap = {
 		reserved: 'uint32',
 		// offset of matrix data
 		dataOffset: 'uint32',
+		// color depth (bits per pixel)
+		dataType: 'uint8',
 		// image dimensions
 		size: 'Dimensions',
-		// color depth (bits per pixel)
-		dataType: 'uint16',
 		// Dimensions of bitmap data
 		dataSize: 'uint32',
+		RowLabels : 'LabelArray',
+		ColumnLabels: 'LabelArray',
 		FeatureData: jBinary.Type({
 			read: function (header) {
 
 				return this.binary.seek(header.dataOffset, function () {
 					var width = header.size.cols, height = header.size.rows;
 					var data = new Array(height);
-					var writeMethod;
-					switch (header.dataType) {
-						case 0:  //float32
-							writeMethod = 'writeFloat32';
-							break;
-						case 1:  //uint32
-							writeMethod = 'writeUInt32';
-							break;
-						case 2: //null terminated string
-							writeMethod = 'writeString';
-							break;
-						}
+					var values ='';
 					var FeatureRow = this.getType(['FeatureRow', header]);
-					for (var y = 0; y < height-1; y++) {
-						var values = this.read(FeatureRow);
+					for (var y = 0; y < height; y++) {
+						values = this.read(FeatureRow);
 						data[y] = values;
 					}
 					return data;
