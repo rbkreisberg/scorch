@@ -11,8 +11,7 @@ define([
 	var heatmap;
 
 	var demoDim = 50,	
-		obj, 
-		data;
+		obj;
 
 	function generateData(dim) {
 		if (arguments.length < 1) dim = demoDim;
@@ -40,8 +39,7 @@ define([
 
 	var reorder = {
 
-		shift : function( label, M ) {
-		var theArray=data[label];
+		shift : function( theArray, M ) {
 	    var size = theArray.length;
 	    theArray.reverse();
 	    Array.prototype.splice.apply(theArray, [0, M - 1].concat(theArray.slice(0, M-1).reverse()));
@@ -49,21 +47,21 @@ define([
 	    return theArray;
 		},
 
-		shuffle : function(label) {
-		return d3.shuffle(data[label]);
+		shuffle : function(theArray) {
+		return d3.shuffle(theArray);
 		}
 	};
 
-	function change(label, type) {
+	function change(label, theArray, type) {
 		heatmap.clear('foreground');
-		heatmap[label](reorder[type](label, 50));
+		heatmap[label](reorder[type](theArray, 1));
 		}
 
 	function setElementHooks() {
 		['cols','rows'].forEach( function(label) {
 			['shift','shuffle'].forEach( function(type) {
 				$('#' + type + '_' + label).on('click', function() {
-					change(label, type);
+					change(label, heatmap[label](), type);
 				});
 			});
 		});
@@ -79,12 +77,16 @@ define([
 
 		$('#load_binary').on('click', function() {
 			binary.loadData('data/heatmap.bin',function(error, matrix) {
-				data.data =  _.map(data.rows, function(r, i) { 
-				 obj = _.object(data.cols, matrix.FeatureData[i]);
-				 obj['id'] = r;
-				 return obj;
-				}, data);
-				Application.renderHeatmap();
+				var data = {
+					data :  _.map(matrix.RowLabels, function(r, i) { 
+					 obj = _.object(matrix.ColumnLabels, matrix.FeatureData[i]);
+					 obj['id'] = r;
+					 return obj;
+					}, data),
+					cols : matrix.ColumnLabels,
+					rows : matrix.RowLabels,
+				};
+				Application.renderHeatmap(data);
 			});
 			
 		});
@@ -97,15 +99,18 @@ define([
 	var Application = {
 		initialize : function() {
 			setElementHooks();
-			data = generateData();
 			return null;
 		},
-		renderHeatmap : function() {
+		start : function() {
+			var data = generateData();
+			this.renderHeatmap(data);
+		},
+		renderHeatmap : function(data) {
 			var map = d3.scorch({
 				data: data.data,
 				cols : data.cols,
 				rows : data.rows,
-				types : _.object(data.cols, _.times(data.dim,function(n) { return 'number'; })),
+				types : _.object(data.rows.length, _.times(data.rows.length, function(n) { return 'number'; })),
 				width: 600,
 				height: 450,
 				mode : 'queue',

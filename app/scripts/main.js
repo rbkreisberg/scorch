@@ -33,5 +33,5 @@ require.config({
 require(['app', 'underscore', 'jquery', 'jQuery-ui', 'bootstrap'], function(app, _, $) {
     'use strict';
     app.initialize();
-    app.renderHeatmap();
+    app.start();
 });
