@@ -2,9 +2,9 @@ node_modules
 dist
 .tmp
 .sass-cache
+*.bin
 app/components
 app/data
-python
 proxy.json
 app/bower_components
 npm-debug.log
