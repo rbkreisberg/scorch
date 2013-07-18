@@ -7,8 +7,7 @@ Heatmap = {
 	'jBinary.mimeType': 'application/octet-stream',
 
 	MatrixDimension: jBinary.Template({
-		baseType: 'uint16',
-		'jBinary.littleEndian' : true,
+		baseType: 'uint16'
 	}),
 
 	Dimensions: {
@@ -16,9 +15,44 @@ Heatmap = {
 		rows: 'MatrixDimension'
 	},
 
-	LabelArray: {
+	ArrayLength: jBinary.Template({
+		params: ['baseType', 'array'],
+		'jBinary.littleEndian': true,
+		write: function (context) {
+			this.baseWrite(context[this.array].length);
+		}
+	}),
 
-	},
+	ArraySize: jBinary.Template({
+		params: ['baseType', 'array'],
+		'jBinary.littleEndian': true,
+		write: function (context) {
+			this.baseWrite(context[this.array].reduce(function (prev,curr) { 
+				return prev + curr.length; 
+			}, 0));
+		}
+	}),
+
+	LabelArray: jBinary.Template({
+		baseType: {
+					_labelLength: ['ArrayLength','uint16','labels'],
+					_labelCount: ['ArraySize','uint16','labels'],
+					labels: ['array','string0','_labelCount']
+		},
+		read: function(header) {
+			return this.baseRead().labels;
+		},
+		write: function(labels) {
+			this.baseWrite({
+				_labelLength: labels.reduce(
+					function (prev,curr) { 
+						return prev + curr.length; 
+					}, 0),
+				_labelCount: labels.length,
+				labels: labels
+			});
+		}
+	}),
 
 	FeatureRow: jBinary.Template({
 
