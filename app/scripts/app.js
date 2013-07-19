@@ -70,7 +70,7 @@ define([
                 if (event.keyCode == $.ui.keyCode.ENTER) {
                     var val = $(this).val();
                     data= generateData(parseInt(val) || demoDim);
-                    Application.renderHeatmap();
+                    Application.renderHeatmap(data);
                     return false;
                 }
         });

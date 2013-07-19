@@ -6,7 +6,6 @@ require.config({
         jquery: '../bower_components/jquery/jquery',
         "jQuery-ui": "../bower_components/jquery-ui/ui/jquery-ui",
         bootstrap: 'vendor/bootstrap',
-        modernizr: '../bower_components/modernizr',
         queue: '../bower_components/queue-async/queue',
         underscore: '../bower_components/underscore/underscore',
         jDataView: '../bower_components/jDataView/src/jDataView',
