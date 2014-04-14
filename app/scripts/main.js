@@ -3,24 +3,17 @@ require.config({
     baseUrl: 'scripts',
 
     paths: {
-        jquery: '../bower_components/jquery/jquery',
+        jquery: '../bower_components/jquery/dist/jquery',
         "jQuery-ui": "../bower_components/jquery-ui/ui/jquery-ui",
-        bootstrap: 'vendor/bootstrap',
-        queue: '../bower_components/queue-async/queue',
+        bootstrap: '../bower_components/bootstrap/dist/js/bootstrap',
         underscore: '../bower_components/underscore/underscore',
-        jDataView: '../bower_components/jDataView/src/jDataView',
-        jBinary : '../bower_components/jBinary/src/jBinary'
+        jdataview: '../bower_components/jdataview/dist/browser/jdataview',
+        jbinary : '../bower_components/jbinary/dist/browser/jbinary'
     },
     shim: {
-        underscore: {
-            'exports' : '_'
-        },
         "jQuery-ui": {
             "deps": ["jquery"],
             "exports": "$"
-        },
-        queue: {
-            'exports': 'queue'
         },
         bootstrap: {
             deps: ['jquery', 'jQuery-ui'],

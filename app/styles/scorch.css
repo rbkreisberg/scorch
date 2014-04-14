@@ -1,6 +1,10 @@
 body {
 	font-size: 14px;
 }
+.hero-unit {
+    margin: 50px auto 0 auto;
+    width: 300px;
+}
 
 #main_container { 
   margin-top: 60px;
