@@ -20,3 +20,7 @@ bower install
 ```bash
 grunt serve &
 ```
+
+## Future Development
+* Mouseover selection/partitioning
+* Server/Client side clustering
