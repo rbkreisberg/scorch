@@ -1,8 +1,13 @@
 image: bradrydzewski/node:0.10
 env: 
 script:
+  - echo `which npm`
+  - npm -v
   - npm install -g grunt-cli bower
-  - npm install
+  - echo "grunt version:"
+  - grunt --version
+  - echo "bower version:"
+  - bower -v
   - bower install
   - grunt build
 notify:
