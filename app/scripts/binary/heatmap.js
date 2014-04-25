@@ -1,6 +1,6 @@
 define([
-	'jBinary', 'jDataView'
-], function(jBinary, jDataView) {
+	'jbinary'
+], function(jBinary) {
 
 Heatmap = {
 	'jBinary.littleEndian': true,

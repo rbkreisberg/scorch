@@ -2,16 +2,16 @@
   "name": "scorch",
   "version": "0.0.0",
   "dependencies": {
-    "sass-bootstrap": "~2.3.0",
-    "requirejs": "~2.1.4",
-    "modernizr": "~2.6.2",
-    "jquery": "~1.9.1",
-    "d3": "~3.2.4",
-    "jquery-ui": "~1.10.3",
+    "bootstrap": "~3.1.1",
+    "requirejs": "~2.1.11",
+    "modernizr": "~2.7.2",
+    "jquery": "~2.1.0",
     "jquery-ui-bootstrap": "~0.2.5",
-    "underscore": "~1.5.1",
-    "jBinary": "git://github.com/jDataView/jBinary.git",
-    "jDataView": "git://github.com/jDataView/jDataView.git"
+    "d3": "~3.4.6",
+    "jquery-ui": "~1.10.4",
+    "underscore": "~1.6.0",
+    "jbinary": "~2.0.6",
+    "jdataview": "~2.4.6"
   },
   "devDependencies": {}
 }
