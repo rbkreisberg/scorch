@@ -13,6 +13,10 @@ a canvas with a queueing system that does not interupt normal browser refreshs.
 npm install -g grunt-cli bower
 npm install
 bower install
+
+cd python
+./write_heatmap.py
+cp heatmap.bin ../app/data
 ```
 
 ## Run Example
