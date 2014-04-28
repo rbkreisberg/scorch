@@ -28,3 +28,4 @@ grunt serve &
 ## Future Development
 * Mouseover selection/partitioning
 * Server/Client side clustering
+* Context/Focus dual panel display
