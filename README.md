@@ -19,6 +19,8 @@ cd python
 cp heatmap.bin ../app/data
 ```
 
+The second set of commands creates a false heatmap dataset and places it in the directory where the application can request it.
+
 ## Run Example
 
 ```bash
