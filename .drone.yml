@@ -16,3 +16,7 @@ notify:
   email:
      recipients:
        - rbkreisberg@gmail.com
+deploy:
+  ssh:
+    target: www@apollo.systembiology.net:/local/vis/webapps/scorch
+    artifacts: dist/
