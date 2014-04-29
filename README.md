@@ -4,8 +4,7 @@
 
 *Scorch* is a heatmap for viewing and manipulating clustered data.
 
-It builds on top of the jDataView and jBinary libraries as a means of compressing large datasets in flight.  The data is then rendered into
-a canvas with a queueing system that does not interupt normal browser refreshs.
+It builds on top of the jDataView and jBinary libraries as a means of compressing large datasets in flight.  The data is then rendered into a canvas with a queueing system that does not interupt normal browser refreshs. 
 
 ## Build
 
@@ -19,13 +18,15 @@ cd python
 cp heatmap.bin ../app/data
 ```
 
-The second set of commands creates a false heatmap dataset and places it in the directory where the application can request it.
+The second set of commands creates a mock heatmap dataset and places it in the directory where the application can request it.
 
 ## Run Example
 
 ```bash
 grunt serve &
 ```
+
+A local web server is created at http://localhost:9000.  Open a web browser to this address to test the tool.
 
 ## Future Development
 * Mouseover selection/partitioning
