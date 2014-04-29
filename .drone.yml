@@ -18,5 +18,5 @@ notify:
        - rbkreisberg@gmail.com
 deploy:
   ssh:
-    target: www@apollo.systembiology.net:/local/vis/webapps/scorch
+    target: www@apollo.systembiology.net:/local/vis/webapps/ROOT/scorch 22
     artifacts: dist/
