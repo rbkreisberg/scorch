@@ -1,8 +1,17 @@
 {
   "name": "ptbweb",
   "version": "0.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "fluxxor": "~1.1.3",
+    "socket.io": "~1.0.2",
+    "socket.io-redis": "~0.1.2",
+    "redis": "~0.10.3",
+    "envify": "~1.2.1",
+    "react": "~0.10.0",
+    "forwarded-for": "0.0.0"
+  },
   "devDependencies": {
+    "browserify": "~4.1.6",
     "grunt": "~0.4.1",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
